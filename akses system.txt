@@ -1,0 +1,18 @@
+akses system
+http://localhost/E-Learning/
+
+login system :
+admin
+user : admin
+pass : 123
+
+guru
+user : guru@gmail.com
+pass : nomor induk pengajar
+
+siswa
+user : nomor induk siswa
+pass : nomor induk siswa
+
+
+
