@@ -1,14 +1,15 @@
-<?php 
+<?php
 session_start();
 include 'config/db.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <title>E-Learning</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="shortcut icon" type="image/png" href="vendor/images/favicon.png"/>
+    <link rel="shortcut icon" type="image/png" href="vendor/images/favicon.png" />
     <link rel="stylesheet" type="text/css" href="vendor/login/vendor/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="vendor/login/fonts/font-awesome-4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" type="text/css" href="vendor/login/fonts/iconic/css/material-design-iconic-font.min.css">
@@ -29,8 +30,9 @@ include 'config/db.php';
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/blazeface"></script>
 </head>
+
 <body>
-    
+
     <div class="limiter">
         <div class="container-login100" style="background-image: url('vendor/login/images/bg-01.jpg');">
             <div class="wrap-login100 p-l-55 p-r-55 p-t-65 p-b-54">
@@ -55,7 +57,7 @@ include 'config/db.php';
                         <input class="input100" type="password" name="password" placeholder="Type your password">
                         <span class="focus-input100" data-symbol="&#xf190;"></span>
                     </div>
-                    
+
                     <div class="wrap-input100 validate-input" data-validate="User type is required">
                         <span class="label-input100">User</span>
                         <select name="level" class="form-control" required style="background-color: #212121; border-radius: 7px; color: #fff; font-weight: bold;">
@@ -65,13 +67,13 @@ include 'config/db.php';
                             <option value="3">Admin</option>
                         </select>
                     </div>
-                    
+
                     <div class="text-right p-t-8 p-b-31">
                         <a href="https://wa.me/6282311801697">
                             Forgot password?
                         </a>
                     </div>
-                    
+
                     <div class="container-login100-form-btn m-b-23">
                         <div class="wrap-login100-form-btn">
                             <div class="login100-form-bgbtn"></div>
@@ -85,9 +87,9 @@ include 'config/db.php';
                 </form>
 
                 <?php
-                if($_SERVER['REQUEST_METHOD'] == 'POST'){
+                if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     $email = trim(mysqli_real_escape_string($con, $_POST['username']));
-                    $pass = sha1($_POST['password']); 
+                    $pass = sha1($_POST['password']);
                     $level = $_POST['level'];
                     $face_image = $_POST['face_image'];
 
@@ -101,10 +103,11 @@ include 'config/db.php';
                             $_SESSION['Guru'] = $id;
                             $_SESSION['upload_gambar'] = TRUE;
 
-                            // Update face image
-                            $stmt = $con->prepare("UPDATE tb_guru SET face_image=? WHERE id_guru=?");
-                            $stmt->bind_param("si", $face_image, $id);
-                            $stmt->execute();
+                            // Insert face image ke dalam tabel tb_face_images
+                            $insert_stmt = $con->prepare("INSERT INTO tb_face_images (face_image, level, user_id) VALUES (?, ?, ?)");
+                            $insert_stmt->bind_param("sii", $face_image, $level, $id);
+                            $insert_stmt->execute();
+                            $insert_stmt->close();
 
                             echo "<script>
                                 Swal.fire({
@@ -130,8 +133,7 @@ include 'config/db.php';
                                 });
                             </script>";
                         }
-
-                    } elseif ($level == '2') { 
+                    } elseif ($level == '2') {
                         $sql = mysqli_query($con, "SELECT * FROM tb_siswa WHERE nis='$email' AND password='$pass' AND aktif='Y'");
                         $data = mysqli_fetch_array($sql);
                         $id = $data[0];
@@ -149,10 +151,11 @@ include 'config/db.php';
                             $_SESSION['tingkat'] = $data['tingkat'];
                             mysqli_query($con, "UPDATE tb_siswa SET status='Online' WHERE id_siswa='$data[id_siswa]'");
 
-                            // Update face image
-                            $stmt = $con->prepare("UPDATE tb_siswa SET face_image=? WHERE id_siswa=?");
-                            $stmt->bind_param("si", $face_image, $id);
-                            $stmt->execute();
+                            // Insert face image ke dalam tabel tb_face_images
+                            $insert_stmt = $con->prepare("INSERT INTO tb_face_images (face_image, level, user_id) VALUES (?, ?, ?)");
+                            $insert_stmt->bind_param("sii", $face_image, $level, $id);
+                            $insert_stmt->execute();
+                            $insert_stmt->close();
 
                             echo "<script>
                                 Swal.fire({
@@ -178,8 +181,7 @@ include 'config/db.php';
                                 });
                             </script>";
                         }
-
-                    } elseif ($level == '3') { 
+                    } elseif ($level == '3') {
                         $sql = mysqli_query($con, "SELECT * FROM tb_admin WHERE username='$email' AND password='$pass'");
                         $data = mysqli_fetch_array($sql);
                         $id = $data[0];
@@ -189,9 +191,11 @@ include 'config/db.php';
                             $_SESSION['Admin'] = $id;
 
                             // Update face image
-                            $stmt = $con->prepare("UPDATE tb_admin SET face_image=? WHERE id_admin=?");
-                            $stmt->bind_param("si", $face_image, $id);
-                            $stmt->execute();
+                            // Insert face image ke dalam tabel tb_face_images
+                            $insert_stmt = $con->prepare("INSERT INTO tb_face_images (face_image, level, user_id) VALUES (?, ?, ?)");
+                            $insert_stmt->bind_param("sii", $face_image, $level, $id);
+                            $insert_stmt->execute();
+                            $insert_stmt->close();
 
                             echo "<script>
                                 Swal.fire({
@@ -236,57 +240,60 @@ include 'config/db.php';
     <script src="vendor/login/js/main.js"></script>
 
     <script>
-    async function detectFace() {
-        const video = document.getElementById('video');
-        const canvas = document.getElementById('canvas');
-        const context = canvas.getContext('2d');
+        async function detectFace() {
+            const video = document.getElementById('video');
+            const canvas = document.getElementById('canvas');
+            const context = canvas.getContext('2d');
 
-        const model = await blazeface.load();
-        let faceDetected = false;
+            const model = await blazeface.load();
+            let faceDetected = false;
 
-        async function detect() {
-            context.drawImage(video, 0, 0, canvas.width, canvas.height);
-            const faces = await model.estimateFaces(canvas, false);
+            async function detect() {
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                const faces = await model.estimateFaces(canvas, false);
 
-            if (faces.length > 0) {
-                console.log('Face detected');
-                const face_image = canvas.toDataURL('image/png');
-                document.getElementById('face_image').value = face_image;
-                faceDetected = true;
-            } else {
-                faceDetected = false;
+                if (faces.length > 0) {
+                    console.log('Face detected');
+                    const face_image = canvas.toDataURL('image/png');
+                    document.getElementById('face_image').value = face_image;
+                    faceDetected = true;
+                } else {
+                    faceDetected = false;
+                }
+
+                requestAnimationFrame(detect);
             }
 
-            requestAnimationFrame(detect);
+            detect();
+
+            // Check for face detection after a certain timeout
+            setTimeout(() => {
+                if (!faceDetected) {
+                    Swal.fire({
+                        title: 'Muka tidak terdeteksi',
+                        text: 'Pastikan tidak ada object yang menutupi muka',
+                        icon: 'warning',
+                        timer: 3000,
+                        showConfirmButton: false
+                    });
+                }
+            }, 5000); // Adjust timeout duration as needed
         }
 
-        detect();
+        detectFace();
 
-        // Check for face detection after a certain timeout
-        setTimeout(() => {
-            if (!faceDetected) {
-                Swal.fire({
-                    title: 'Muka tidak terdeteksi',
-                    text: 'Pastikan tidak ada object yang menutupi muka',
-                    icon: 'warning',
-                    timer: 3000,
-                    showConfirmButton: false
-                });
-            }
-        }, 5000); // Adjust timeout duration as needed
-    }
-
-    detectFace();
-
-    navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "user" },
-        audio: false
-    }).then(stream => {
-        const video = document.getElementById('video');
-        video.srcObject = stream;
-    }).catch(err => {
-        console.error("Error accessing webcam: ", err);
-    });
+        navigator.mediaDevices.getUserMedia({
+            video: {
+                facingMode: "user"
+            },
+            audio: false
+        }).then(stream => {
+            const video = document.getElementById('video');
+            video.srcObject = stream;
+        }).catch(err => {
+            console.error("Error accessing webcam: ", err);
+        });
     </script>
 </body>
+
 </html>
