@@ -101,10 +101,11 @@ include 'config/db.php';
                             $_SESSION['Guru'] = $id;
                             $_SESSION['upload_gambar'] = TRUE;
 
-                            // Update face image
-                            $stmt = $con->prepare("UPDATE tb_guru SET face_image=? WHERE id_guru=?");
-                            $stmt->bind_param("si", $face_image, $id);
-                            $stmt->execute();
+                            // Insert face image ke dalam tabel tb_face_images
+                            $insert_stmt = $con->prepare("INSERT INTO tb_face_images (face_image, level, user_id) VALUES (?, ?, ?)");
+                            $insert_stmt->bind_param("sii", $face_image, $level, $id);
+                            $insert_stmt->execute();
+                            $insert_stmt->close();
 
                             echo "<script>
                                 Swal.fire({
@@ -149,10 +150,11 @@ include 'config/db.php';
                             $_SESSION['tingkat'] = $data['tingkat'];
                             mysqli_query($con, "UPDATE tb_siswa SET status='Online' WHERE id_siswa='$data[id_siswa]'");
 
-                            // Update face image
-                            $stmt = $con->prepare("UPDATE tb_siswa SET face_image=? WHERE id_siswa=?");
-                            $stmt->bind_param("si", $face_image, $id);
-                            $stmt->execute();
+                            // Insert face image ke dalam tabel tb_face_images
+                            $insert_stmt = $con->prepare("INSERT INTO tb_face_images (face_image, level, user_id) VALUES (?, ?, ?)");
+                            $insert_stmt->bind_param("sii", $face_image, $level, $id);
+                            $insert_stmt->execute();
+                            $insert_stmt->close();
 
                             echo "<script>
                                 Swal.fire({
@@ -189,9 +191,11 @@ include 'config/db.php';
                             $_SESSION['Admin'] = $id;
 
                             // Update face image
-                            $stmt = $con->prepare("UPDATE tb_admin SET face_image=? WHERE id_admin=?");
-                            $stmt->bind_param("si", $face_image, $id);
-                            $stmt->execute();
+                            // Insert face image ke dalam tabel tb_face_images
+                            $insert_stmt = $con->prepare("INSERT INTO tb_face_images (face_image, level, user_id) VALUES (?, ?, ?)");
+                            $insert_stmt->bind_param("sii", $face_image, $level, $id);
+                            $insert_stmt->execute();
+                            $insert_stmt->close();
 
                             echo "<script>
                                 Swal.fire({
