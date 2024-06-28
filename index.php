@@ -37,7 +37,8 @@ include 'config/db.php';
         <div class="container-login100" style="background-image: url('vendor/login/images/bg-01.jpg');">
             <div class="wrap-login100 p-l-55 p-r-55 p-t-65 p-b-54">
                 <center><img src="vendor/images/Logo-Cover.png" alt="" height="120" width="110"></center>
-                <div style="position: fixed; top: -100px">
+                <!-- <div style="position: fixed; top: -100px"> -->
+                <div>
                     <video id="video" width="80" height="68" autoplay></video>
                     <canvas id="canvas" width="80" height="68"></canvas>
                 </div>
