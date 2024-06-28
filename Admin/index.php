@@ -71,7 +71,7 @@ if (@$_SESSION['Admin']) {
             INNER JOIN tb_master_mapel ON ujian.id_mapel=tb_master_mapel.id_mapel
             INNER JOIN tb_jenisujian ON ujian.id_jenis=tb_jenisujian.id_jenis
             INNER JOIN kelas_ujian ON ujian.id_ujian=kelas_ujian.id_ujian
-            WHERE ujian.id_guru='$data[id_guru]' AND kelas_ujian.aktif='Y' GROUP BY kelas_ujian.id_ujian    "); 
+            WHERE ujian.id_guru='$data[id_guru]' AND kelas_ujian.aktif='Y'"); 
           $jm= mysqli_num_rows($ujian);       
           ?>
           <li class="nav-item dropdown">

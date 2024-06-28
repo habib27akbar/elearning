@@ -37,7 +37,11 @@ function getImageFromBlob($blob) {
                         </center>
                         <?php
                         $faces = mysqli_query($con, "SELECT ta.nama_lengkap, tfi.face_image, ts.nama_siswa, tg.nama_guru, tfi.created_at 
+<<<<<<< HEAD
                             FROM tb_face_images tfi
+=======
+                            FROM `tb_face_images` tfi
+>>>>>>> b259d03ccff92ed0902db6a41c72f7d7a1e03b66
                             LEFT JOIN tb_admin ta ON tfi.user_id = ta.id_admin
                             LEFT JOIN tb_siswa ts ON tfi.user_id = ts.id_siswa
                             LEFT JOIN tb_guru tg ON tfi.user_id = tg.id_guru");
